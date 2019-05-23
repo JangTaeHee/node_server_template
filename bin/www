@@ -1,0 +1,70 @@
+const app = require('../app')
+const database = require('../db/oraclePool')
+
+process.env.UV_THREADPOOL_SIZE = 20
+
+console.log('Starting application')
+console.log('Opening connections to databases')
+
+database.openConnections()
+  .then(() => {
+    console.log('Starting web server')
+
+    return app.start()
+  })
+  .catch(err => {
+    console.log('Encountered error', err)
+
+    process.exit(1)
+  })
+
+process.on('uncaughtException', err => {
+  console.log('Uncaught exception', err)
+
+  shutdown(err)
+})
+
+process.on('SIGTERM', () => {
+  console.log('Recevied SIGTERM')
+
+  shutdown()
+})
+
+process.on('SIGINT', () => {
+  console.log('Recevied SIGINT')
+
+  shutdown()
+})
+
+function shutdown(e) {
+  let err = e
+
+  console.log('Shutting down')
+  console.log('Closing web server')
+
+  app.stop()
+    .catch(e => {
+      console.log('Encountered error', e)
+
+      err = err || e
+    })
+    .then(() => {
+      console.log('Closing connection to databases')
+
+      return database.closeConnections()
+    })
+    .catch(e => {
+      console.log('Encountered error', e)
+
+      err = err || e
+    })
+    .then(() => {
+      console.log('Exiting process')
+
+      if(err){
+        process.exit(1)
+      }else{
+        process.exit(0)
+      }
+    })
+}

@@ -9,7 +9,8 @@ const mysqlPool = mysql.createPool = {
 };
 const oraclePool = {
   clmns : {
-    connectString 			: 'host',
+    connectString 			: 'host:1521/ORCL',
+    //connectString 			: '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=host)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SID=ORCL)))',
     user			: 'db user',
     password		: 'db user pw',
     poolMax : 20,

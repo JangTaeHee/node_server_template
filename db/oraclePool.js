@@ -47,6 +47,7 @@ module.exports.closeConnections = closeConnections
 
 function simpleExcute(connection, statement, binds=[], opts={}){
     return new Promise((resolve, reject) => {
+        let result
         let conn
         let err
         opts.outFormat = oracledb.OBJECT
